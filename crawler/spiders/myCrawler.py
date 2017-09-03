@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
+from crawler.items import MyItem
+
 class NgaSpders(scrapy.Spider):
     name = "NgaSpider"
     currName = ""
     #host = "http://bbs.ngacn.cc/"
-    # start_urls是我们准备爬的初始页
+    # start_urls脢脟脦脪脙脟脳录卤赂脜脌碌脛鲁玫脢录脪鲁
     def start_requests(self):
         urls = [
            # 'https://www.zhihu.com/question/60543259/answer/177762193',
@@ -14,8 +16,8 @@ class NgaSpders(scrapy.Spider):
         for url in urls:
             yield scrapy.Request(url = url,callback=self.getData)
 
-	# 这个是解析函数，如果不特别指明的话，scrapy抓回来的页面会由这个函数进行解析。
-    # 对页面的处理和分析工作都在此进行，这个示例里我们只是简单地把页面内容打印出来。
+	# 脮芒赂枚脢脟陆芒脦枚潞炉脢媒拢卢脠莽鹿没虏禄脤脴卤冒脰赂脙梅碌脛禄掳拢卢scrapy脳楼禄脴脌麓碌脛脪鲁脙忙禄谩脫脡脮芒赂枚潞炉脢媒陆酶脨脨陆芒脦枚隆拢
+    # 露脭脪鲁脙忙碌脛麓娄脌铆潞脥路脰脦枚鹿陇脳梅露录脭脷麓脣陆酶脨脨拢卢脮芒赂枚脢戮脌媒脌茂脦脪脙脟脰禄脢脟录貌碌楼碌脴掳脩脪鲁脙忙脛脷脠脻麓貌脫隆鲁枚脌麓隆拢
     def parse(self, response):
         print '+++++++++++++++++++'
         for quote in response.xpath('//ul/li'):
@@ -55,10 +57,29 @@ class NgaSpders(scrapy.Spider):
 
 
     def getData(self, response):
+        items = []
         for quote in response.xpath('//div[@class="words"]'):
             print "++++++++++++++"
-            print quote    
-            chars = quote.xpath('//br')
-            print chars
+            htmlStr = quote.extract()
+            strLen = len(htmlStr)
+            htmlStr =  htmlStr[20:strLen-6]   
+            print htmlStr
+
+            spans = htmlStr.split('<br>')
+            print spans
+
+            words = []
+            for span in spans:
+                span = span.strip()
+                chars = "".join(span.split('<span>')).split('</span>')
+                print chars
+                if len("".join(chars)) > 0:
+                    words.append("".join(chars))
+
+            item = MyItem()
+            item['chars'] = words
+            items.append(item)
+        return items 
+
             
                            
